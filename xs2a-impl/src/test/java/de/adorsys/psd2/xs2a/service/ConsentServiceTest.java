@@ -189,7 +189,7 @@ public class ConsentServiceTest {
             .thenReturn(Optional.of(getXs2aAccountAccess(Collections.singletonList(getXs2aReference(CORRECT_IBAN, CURRENCY)), null, null, false, false)));
 
         //AisReportMock
-        doNothing().when(aisConsentService).consentActionLog(anyString(), anyString(), any(ActionStatus.class), anyString());
+        doNothing().when(aisConsentService).consentActionLog(anyString(), anyString(), any(ActionStatus.class), anyString(), anyBoolean());
         //ByPSU-ID
         when(aisConsentService.createConsent(getCreateConsentRequest(getAccess(Arrays.asList(getReference(CORRECT_IBAN, CURRENCY), getReference(CORRECT_IBAN_1, CURRENCY_2)), Collections.emptyList(), Collections.emptyList(), true, false)), PSU_ID_DATA, buildTppInfo()))
             .thenReturn(CONSENT_ID);
@@ -775,7 +775,8 @@ public class ConsentServiceTest {
         //When:
         ResponseObject response = consentService.deleteAccountConsentsById(WRONG_CONSENT_ID);
         //Than:
-        assertThat(response.getError().getErrorType()).isEqualTo(ErrorType.AIS_400);
+        assertThat(response.getError().getErrorType()).isEqualTo(ErrorType.AIS_403);
+        assertThat(response.getError().getTppMessage().getMessageErrorCode()).isEqualTo(MessageErrorCode.CONSENT_UNKNOWN_403);
     }
 
     @Test
