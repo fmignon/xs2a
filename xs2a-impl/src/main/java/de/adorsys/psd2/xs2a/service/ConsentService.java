@@ -189,7 +189,7 @@ public class ConsentService {
 
         if (!validatedAccountConsentOptional.isPresent()) {
             return responseBuilder
-                       .fail(AIS_400, of(CONSENT_UNKNOWN_400))
+                       .fail(AIS_403, of(CONSENT_UNKNOWN_403))
                        .build();
         }
 
