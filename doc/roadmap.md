@@ -13,7 +13,6 @@
 - Delete createAuthorization in AisConsentAuthorisationServiceBase in v.2.7 
 
 ### version 3.5 (Planned date 07.06.2019)
-- AspspConsentData refactoring
 - Remove deprecated AspspConsentData updates in v.3.5 
 
 ## Further development
@@ -72,6 +71,7 @@ No backward compatibility with 2.x is guaranteed.
 
 
 ### version 3.6 (Planned date 21.06.2019)
+- AspspConsentData refactoring
 - Execute payment without sca in OAuth approach 
 
 ### version 3.7 (Planned date 05.07.2019)
