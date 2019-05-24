@@ -59,18 +59,23 @@ This bug appeared only if ASPSP supported PIIS consent(`piisConsentSupported` pr
 == Bugfix: Encryption performance doesn't correspond requirements. Refactoring encryption id and ASPSP Data
 
 From now on, `crypto_algorithm` table has flexible settings for crypto algorithms.
-In order to add new crypto algorithms with its settings one needs create new row in `crypto_algorithm` table which has to have mandatory fields:
- - algorithm_id (uniq DB identifier)
- - external_id (uniq any identifier)
- - encryptor_class (full path to java class that implements `de.adorsys.psd2.consent.service.security.provider.CryptoInstanceFactory`)
- - encryptor_params (string with necessary parameters for initializing new crypto provider)
+In order to add new crypto algorithms with its settings one needs to create a new row in `crypto_algorithm` table in the database with following mandatory fields:
 
-In existing providers the following formats of `encryptor_params` is used:
-`AES/ECB/PKCS5Padding\_#_5_#\_256_#\_1024_#_PBKDF2WithHmacSHA256`
+ - `algorithm_id`  - unique identifier DB in the database
+ - `external_id` - unique algorithm identifier
+ - `encryptor_class` - full path to java class that implements `de.adorsys.psd2.consent.service.security.provider.CryptoInstanceFactory`
+ - `encryptor_params` - string with necessary parameters for initializing new crypto provider
 
- - "\_#_" is string separator
- - `AES/ECB/PKCS5Padding` is algorithm name
- - `5` is algorithm version (could be any value)
- - `256` is key length
- - `1024` is number of iterations for hash generation
- - `PBKDF2WithHmacSHA256` is algorithm for creating secret key
+In existing providers the following format of `encryptor_params` is used:
+`AES/ECB/PKCS5Padding\_#_5_#\_256_#\_1024_#_PBKDF2WithHmacSHA256`, where:
+
+ - `\_#_` is a string separator
+ - `AES/ECB/PKCS5Padding` is the algorithm name
+ - `5` is the algorithm version (could be any value)
+ - `256` is the key length
+ - `1024` is the number of iterations for hash generation
+ - `PBKDF2WithHmacSHA256` is the algorithm for creating secret key
+
+To change current crypto providers one needs to modify the `encryption.defaultProvider.dataProvider`
+(provider for encrypting ASPSP consent data) and `encryption.defaultProvider.idProvider` (provider for encrypting IDs) properties by
+setting them to the external IDs (as stored in the database) of desired crypto algorithms.
