@@ -1,43 +1,20 @@
 = Release notes v. 3.4
 
-New version XS2A 3.4 is released on 24.05.2019
-
-Main points of new Release:
-* Counting frequencyPerDay only for requests without PSU involvement
-* Performance improvements at CMS
-* Bugfixing
-* Removing deprecated methods
-* Configure Postman tests for xs2a and xs2a-Connector-examples
-
-
-Released artifacts can be used via Maven dependencies, i.e.
-```xml
-<dependency>
-    <groupId>de.adorsys.psd2</groupId>
-    <artifactId>xs2a-impl</artifactId>
-    <version>3.4</version>
-</dependency>
-```
-or Docker images published on Docker Hub: https://hub.docker.com/u/adorsys/
-
-Please take a look also on our [Roadmap](https://adorsys.github.io/xs2a/roadmap.html) to get updated about upcoming versions.
-
-
 == Table of Contents
 
-- Update version of spring-data-jpa to 2.1.8.RELEASE
-- Bugfix: `transactionFeeIndicator` tag is provided in payment initiation request even if it is not supported by Bank
-- Bugfix: Incorrect property name in the response to the AIS consent creation request
-- Update version of spring-data-jpa to 1.11.22.RELEASE
-- Bugfix: Periodic payment: requestedExecutionTime and requestedExecutionDate properties are set to the default values by mappers
-- Removed deprecated getters in SpiExchangeRate class
-- Bugfix: Delete a non-existing consent returns wrong http status code
-- Counting frequencyPerDay only for one-off consent or for recurring consent without PSU IP address
-- PSU-IP-Address header is mandatory in AIS consent creation request
-- Bugifx: XS2A returns error on creating authorisation if the request URL contains context path
-- Bugfix: AIS consent can be created with invalid `access` tag
-- Bugfix: Error "NO_PIIS_ACTIVATION" during Funds-Confirmations request was fixed
-- Bugfix: Encryption performance doesn't correspond requirements
+* Update version of spring-data-jpa to 2.1.8.RELEASE
+* Bugfix: `transactionFeeIndicator` tag is provided in payment initiation request even if it is not supported by Bank
+* Bugfix: Incorrect property name in the response to the AIS consent creation request
+* Update version of spring-data-jpa to 1.11.22.RELEASE
+* Bugfix: Periodic payment: requestedExecutionTime and requestedExecutionDate properties are set to the default values by mappers
+* Removed deprecated getters in SpiExchangeRate class
+* Bugfix: Delete a non-existing consent returns wrong http status code
+* Counting frequencyPerDay only for one-off consent or for recurring consent without PSU IP address
+* PSU-IP-Address header is mandatory in AIS consent creation request
+* Bugifx: XS2A returns error on creating authorisation if the request URL contains context path
+* Bugfix: AIS consent can be created with invalid `access` tag
+* Bugfix: Error "NO_PIIS_ACTIVATION" during Funds-Confirmations request was fixed
+* Bugfix: Encryption performance doesn't correspond requirements
 
 
 == Update version of spring-data-jpa to 2.1.8.RELEASE
@@ -94,4 +71,3 @@ This bug appeared only if ASPSP supported PIIS consent(`piisConsentSupported` pr
 == Bugfix: Encryption performance doesn't correspond requirements
 
 Cryptography algorithms were adjusted in order to increase performance.
-
