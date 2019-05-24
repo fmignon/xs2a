@@ -100,7 +100,7 @@ Status settlement:
 * Not confirmed with SCA payments obsolete after a certain period. Payment Transaction Status becomes "rejected" and Sca Status for dedicated payment authorisation becomes "failed".
 * In case TPP tries to initiate new authorisation for expired payment, XS2A sends the response with HTTP code 403 RESOURCE_EXPIRED.
 
-The transaction status of the payment initiation resource which defines as *Finalised*:
+The transaction statuses of the payment initiation resource which are defined as *Finalised*:
 
 * *Cancelled* (Payment initiation has been cancelled before execution).
 * *Rejected* (Payment initiation or individual transaction included in the payment initiation has been rejected).
@@ -398,7 +398,7 @@ Status settlement:
 * While creating consent, In case of existing old recurring authorised consent for one TPP and one PSU - its consent status becomes "Terminated_by_TPP" as soon as new recurring consent becomes authorised (consent status set to VALID).
 * Consent without successful authorisation expire after a certain period. Consent Status becomes "rejected" and Sca Status for consent authorisation becomes "failed".
 
-Statuses which defines as *Finalised*:
+Statuses which are defined as *Finalised*:
 
 * *Rejected* (The consent data have been rejected e.g. since no successful authorisation has taken place)
 * *RevokedByPSU* (The consent has been revoked by the PSU)
@@ -457,7 +457,6 @@ All Read Account Data Requests contain consentID of Consent which was given to T
 * Account data should be asked by the same TPP which was given a Consent (TPP Reg_Num = tpp_id). In case when validation is unsuccessful, XS2A sends the response with HTTP code 400 CONSENT_UNKNOWN.
 * First check should be for consent access, and then for expiration.
 * The consent is considered ready to be used by the TPP to access the AIS service when the status is VALID. A consent with RECEIVED status does not have an access token yet. If TPP wants to get account details, transaction and balance with consent which status is Received, XS2A sends the response with HTTP code 401 CONSENT_INVALID.
-* First check should be for consent access, and then for expiration.
 
 ==== Granted Permission in appropriate Consent:
 * For Get accounts with balances (query parameter *withBalance = true* ) validate if permission exists in the Consent.  In case when validation is unsuccessful, XS2A sends the response with HTTP code 401 CONSENT_INVALID and output "The consent was created by this TPP but is not valid for the addressed service/resource".
