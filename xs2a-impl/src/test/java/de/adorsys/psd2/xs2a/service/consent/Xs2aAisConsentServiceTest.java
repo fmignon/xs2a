@@ -16,11 +16,11 @@
 
 package de.adorsys.psd2.xs2a.service.consent;
 
+import de.adorsys.psd2.consent.api.ActionStatus;
 import de.adorsys.psd2.consent.api.CmsScaMethod;
 import de.adorsys.psd2.consent.api.ais.*;
 import de.adorsys.psd2.consent.api.service.AisConsentAuthorisationServiceEncrypted;
 import de.adorsys.psd2.consent.api.service.AisConsentServiceEncrypted;
-import de.adorsys.psd2.xs2a.core.ais.AccountAccessType;
 import de.adorsys.psd2.xs2a.core.consent.AisConsentRequestType;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.profile.ScaApproach;
@@ -36,9 +36,10 @@ import de.adorsys.psd2.xs2a.service.mapper.consent.Xs2aAuthenticationObjectToCms
 import de.adorsys.psd2.xs2a.service.profile.FrequencyPerDateCalculationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -57,6 +59,8 @@ public class Xs2aAisConsentServiceTest {
     private static final String AUTHORISATION_ID = "a01562ea-19ff-4b5a-8188-c45d85bfa20a";
     private static final String WRONG_AUTHORISATION_ID = "Wrong authorisation id";
     private static final String AUTHENTICATION_METHOD_ID = "19ff-4b5a-8188";
+    private static final String TPP_ID = "Test TppId";
+    private static final String REQUEST_URI = "request/uri";
     private static final ScaStatus SCA_STATUS = ScaStatus.RECEIVED;
     private static final ScaApproach SCA_APPROACH = ScaApproach.DECOUPLED;
     private static final CreateConsentReq CREATE_CONSENT_REQ = buildCreateConsentReq();
@@ -410,6 +414,24 @@ public class Xs2aAisConsentServiceTest {
         assertThat(actualResponse).isFalse();
     }
 
+    @Test
+    public void consentActionLog() {
+        //Given
+        ActionStatus actionStatus = ActionStatus.SUCCESS;
+        ArgumentCaptor<AisConsentActionRequest> argumentCaptor = ArgumentCaptor.forClass(AisConsentActionRequest.class);
+        //When
+        xs2aAisConsentService.consentActionLog(TPP_ID, CONSENT_ID, actionStatus, REQUEST_URI, true);
+        //Then
+        verify(aisConsentServiceEncrypted).checkConsentAndSaveActionLog(argumentCaptor.capture());
+
+        AisConsentActionRequest aisConsentActionRequest = argumentCaptor.getValue();
+        assertThat(aisConsentActionRequest.getTppId()).isEqualTo(TPP_ID);
+        assertThat(aisConsentActionRequest.getConsentId()).isEqualTo(CONSENT_ID);
+        assertThat(aisConsentActionRequest.getActionStatus()).isEqualTo(actionStatus);
+        assertThat(aisConsentActionRequest.getRequestUri()).isEqualTo(REQUEST_URI);
+        assertThat(aisConsentActionRequest.isUpdateUsage()).isTrue();
+    }
+
     private static TppInfo buildTppInfo() {
         TppInfo tppInfo = new TppInfo();
         tppInfo.setAuthorisationNumber("registrationNumber");
@@ -435,10 +457,6 @@ public class Xs2aAisConsentServiceTest {
 
     private static AccountConsent createConsent(String id) {
         return new AccountConsent(id, new Xs2aAccountAccess(null, null, null, null, null), false, LocalDate.now(), 4, LocalDate.now(), ConsentStatus.VALID, false, false, null, null, AisConsentRequestType.GLOBAL, false, Collections.emptyList(), OffsetDateTime.now(), Collections.emptyMap());
-    }
-
-    private static Xs2aAccountAccess createEmptyAccountAccess() {
-        return new Xs2aAccountAccess(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), AccountAccessType.ALL_ACCOUNTS_WITH_BALANCES, AccountAccessType.ALL_ACCOUNTS_WITH_BALANCES);
     }
 
     private static CreateAisConsentAuthorizationResponse buildCreateAisConsentAuthorizationResponse() {

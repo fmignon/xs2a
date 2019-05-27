@@ -101,6 +101,7 @@ public class ConsentServiceTest {
     private static final String CORRECT_IBAN = "DE123456789";
     private static final String CORRECT_IBAN_1 = "DE987654321";
     private static final String WRONG_IBAN = "WRONG IBAN";
+    private static final String TEST_PSU_MESSAGE = "This test message is created in ASPSP and directed to PSU";
     private static final Currency CURRENCY = Currency.getInstance("EUR");
     private static final Currency CURRENCY_2 = Currency.getInstance("USD");
     private static final LocalDate DATE = LocalDate.now().plusDays(1);
@@ -181,6 +182,7 @@ public class ConsentServiceTest {
     private GetConsentAuthorisationsValidator getConsentAuthorisationsValidator;
     @Mock
     private GetConsentAuthorisationScaStatusValidator getConsentAuthorisationScaStatusValidator;
+    private TppInfo tppInfo;
 
     @Before
     public void setUp() {
@@ -188,23 +190,26 @@ public class ConsentServiceTest {
         when(spiToXs2aAccountAccessMapper.mapToAccountAccess(any()))
             .thenReturn(Optional.of(getXs2aAccountAccess(Collections.singletonList(getXs2aReference(CORRECT_IBAN, CURRENCY)), null, null, false, false)));
 
+        //ByPSU-ID
+        tppInfo = buildTppInfo();
+
         //ByAccess
-        when(aisConsentService.createConsent(getCreateConsentRequest(getAccess(getReferenceList(), Collections.emptyList(), Collections.emptyList(), false, false)), PSU_ID_DATA, buildTppInfo()))
+        when(aisConsentService.createConsent(getCreateConsentRequest(getAccess(getReferenceList(), Collections.emptyList(), Collections.emptyList(), false, false)), PSU_ID_DATA, tppInfo))
             .thenReturn(CONSENT_ID);
         when(aisConsentService.createConsent(getCreateConsentRequest(getAccess(
-            Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), true, false)), PSU_ID_DATA, buildTppInfo()))
+            Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), true, false)), PSU_ID_DATA, tppInfo))
             .thenReturn(CONSENT_ID);
         when(aisConsentService.createConsent(getCreateConsentRequest(getAccess(
-            Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), false, true)), PSU_ID_DATA, buildTppInfo()))
+            Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), false, true)), PSU_ID_DATA, tppInfo))
             .thenReturn(CONSENT_ID);
         when(aisConsentService.createConsent(getCreateConsentRequest(getAccess(
-            Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), false, false)), PSU_ID_DATA, buildTppInfo()))
+            Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), false, false)), PSU_ID_DATA, tppInfo))
             .thenReturn(CONSENT_ID);
         when(aisConsentService.createConsent(getCreateConsentRequest(getAccess(
-            Collections.singletonList(getReference(CORRECT_IBAN, CURRENCY)), Collections.singletonList(getReference(CORRECT_IBAN_1, CURRENCY_2)), Collections.singletonList(getReference(CORRECT_IBAN, CURRENCY)), false, false)), PSU_ID_DATA, buildTppInfo()))
+            Collections.singletonList(getReference(CORRECT_IBAN, CURRENCY)), Collections.singletonList(getReference(CORRECT_IBAN_1, CURRENCY_2)), Collections.singletonList(getReference(CORRECT_IBAN, CURRENCY)), false, false)), PSU_ID_DATA, tppInfo))
             .thenReturn(CONSENT_ID);
         when(aisConsentService.createConsent(getCreateConsentRequest(getAccess(
-            Collections.singletonList(getReference(CORRECT_IBAN, CURRENCY)), Collections.singletonList(getReference(CORRECT_IBAN_1, CURRENCY_2)), Collections.emptyList(), false, false)), PSU_ID_DATA, buildTppInfo()))
+            Collections.singletonList(getReference(CORRECT_IBAN, CURRENCY)), Collections.singletonList(getReference(CORRECT_IBAN_1, CURRENCY_2)), Collections.emptyList(), false, false)), PSU_ID_DATA, tppInfo))
             .thenReturn(CONSENT_ID);
 
         //GetConsentById
@@ -213,7 +218,7 @@ public class ConsentServiceTest {
         when(aisConsentService.getAccountConsentById(CONSENT_ID_FINALISED)).thenReturn(Optional.of(getAccountConsentFinalised(CONSENT_ID, getXs2aAccountAccess(Collections.singletonList(getXs2aReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false)));
         when(aisConsentService.getAccountConsentById(WRONG_CONSENT_ID)).thenReturn(null);
 
-        when(tppService.getTppInfo()).thenReturn(buildTppInfo());
+        when(tppService.getTppInfo()).thenReturn(tppInfo);
 
         when(aspspConsentDataService.getAspspConsentDataByConsentId(anyString()))
             .thenReturn(ASPSP_CONSENT_DATA);
@@ -238,9 +243,10 @@ public class ConsentServiceTest {
         when(getConsentAuthorisationScaStatusValidator.validate(any(CommonConsentObject.class)))
             .thenReturn(ValidationResult.valid());
 
-        when(spiContextDataProvider.provide()).thenReturn(SPI_CONTEXT_DATA);
-        when(spiContextDataProvider.provide(eq(PSU_ID_DATA), any(TppInfo.class))).thenReturn(SPI_CONTEXT_DATA);
-        when(spiContextDataProvider.provideWithPsuIdData(any())).thenReturn(SPI_CONTEXT_DATA);
+        SpiContextData spiContextData = new SpiContextData(SPI_PSU_DATA, tppInfo, UUID.randomUUID());
+        when(spiContextDataProvider.provide()).thenReturn(spiContextData);
+        when(spiContextDataProvider.provide(PSU_ID_DATA, tppInfo)).thenReturn(spiContextData);
+        when(spiContextDataProvider.provideWithPsuIdData(any())).thenReturn(spiContextData);
     }
 
     @Test
@@ -256,7 +262,7 @@ public class ConsentServiceTest {
 
         when(aisConsentSpi.initiateAisConsent(any(SpiContextData.class), any(SpiAccountConsent.class), any(AspspConsentData.class)))
             .thenReturn(SpiResponse.<SpiInitiateAisConsentResponse>builder()
-                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false))
+                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false, TEST_PSU_MESSAGE))
                             .aspspConsentData(ASPSP_CONSENT_DATA)
                             .success());
 
@@ -264,6 +270,7 @@ public class ConsentServiceTest {
         CreateConsentResponse response = responseObj.getBody();
         //Then:
         assertThat(response.getConsentId()).isEqualTo(CONSENT_ID);
+        assertThat(response.getPsuMessage()).isEqualTo(TEST_PSU_MESSAGE);
     }
 
     @Test
@@ -278,7 +285,7 @@ public class ConsentServiceTest {
             .thenReturn(createValidationResult(true, null));
         when(aisConsentSpi.initiateAisConsent(any(SpiContextData.class), any(SpiAccountConsent.class), any(AspspConsentData.class)))
             .thenReturn(SpiResponse.<SpiInitiateAisConsentResponse>builder()
-                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false))
+                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false, TEST_PSU_MESSAGE))
                             .aspspConsentData(ASPSP_CONSENT_DATA)
                             .success());
 
@@ -304,7 +311,7 @@ public class ConsentServiceTest {
         when(aisConsentSpi.initiateAisConsent(any(SpiContextData.class), any(SpiAccountConsent.class), any(AspspConsentData.class)))
             .thenReturn(SpiResponse.<SpiInitiateAisConsentResponse>builder()
                             .aspspConsentData(ASPSP_CONSENT_DATA)
-                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false))
+                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false, TEST_PSU_MESSAGE))
                             .success());
 
         ResponseObject<CreateConsentResponse> responseObj = consentService.createAccountConsentsWithResponse(
@@ -312,6 +319,7 @@ public class ConsentServiceTest {
         CreateConsentResponse response = responseObj.getBody();
         //Then:
         assertThat(response.getConsentId()).isEqualTo(CONSENT_ID);
+        assertThat(response.getPsuMessage()).isEqualTo(TEST_PSU_MESSAGE);
     }
 
     @Test
@@ -353,7 +361,7 @@ public class ConsentServiceTest {
         when(aisConsentSpi.initiateAisConsent(any(SpiContextData.class), any(SpiAccountConsent.class), any(AspspConsentData.class)))
             .thenReturn(SpiResponse.<SpiInitiateAisConsentResponse>builder()
                             .aspspConsentData(ASPSP_CONSENT_DATA)
-                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false))
+                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false, TEST_PSU_MESSAGE))
                             .success());
 
         ResponseObject<CreateConsentResponse> responseObj = consentService.createAccountConsentsWithResponse(
@@ -361,6 +369,7 @@ public class ConsentServiceTest {
         CreateConsentResponse response = responseObj.getBody();
         //Then:
         assertThat(response.getConsentId()).isEqualTo(CONSENT_ID);
+        assertThat(response.getPsuMessage()).isEqualTo(TEST_PSU_MESSAGE);
     }
 
     @Test
@@ -378,7 +387,7 @@ public class ConsentServiceTest {
         when(aisConsentSpi.initiateAisConsent(any(SpiContextData.class), any(SpiAccountConsent.class), any(AspspConsentData.class)))
             .thenReturn(SpiResponse.<SpiInitiateAisConsentResponse>builder()
                             .aspspConsentData(ASPSP_CONSENT_DATA)
-                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false))
+                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false, TEST_PSU_MESSAGE))
                             .success());
 
         ResponseObject<CreateConsentResponse> responseObj = consentService.createAccountConsentsWithResponse(
@@ -386,6 +395,7 @@ public class ConsentServiceTest {
         CreateConsentResponse response = responseObj.getBody();
         //Then:
         assertThat(response.getConsentId()).isEqualTo(CONSENT_ID);
+        assertThat(response.getPsuMessage()).isEqualTo(TEST_PSU_MESSAGE);
     }
 
     @Test
@@ -402,7 +412,7 @@ public class ConsentServiceTest {
         when(aisConsentSpi.initiateAisConsent(any(SpiContextData.class), any(SpiAccountConsent.class), any(AspspConsentData.class)))
             .thenReturn(SpiResponse.<SpiInitiateAisConsentResponse>builder()
                             .aspspConsentData(ASPSP_CONSENT_DATA)
-                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false))
+                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false, TEST_PSU_MESSAGE))
                             .success());
 
         ResponseObject<CreateConsentResponse> responseObj = consentService.createAccountConsentsWithResponse(
@@ -410,6 +420,7 @@ public class ConsentServiceTest {
         CreateConsentResponse response = responseObj.getBody();
         //Then:
         assertThat(response.getConsentId()).isEqualTo(CONSENT_ID);
+        assertThat(response.getPsuMessage()).isEqualTo(TEST_PSU_MESSAGE);
     }
 
     @Test
@@ -425,7 +436,7 @@ public class ConsentServiceTest {
 
         when(aisConsentSpi.initiateAisConsent(any(SpiContextData.class), any(SpiAccountConsent.class), any(AspspConsentData.class)))
             .thenReturn(SpiResponse.<SpiInitiateAisConsentResponse>builder()
-                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false))
+                            .payload(new SpiInitiateAisConsentResponse(getSpiAccountAccess(Collections.singletonList(getSpiReference(CORRECT_IBAN, CURRENCY)), null, null, false, false), false, TEST_PSU_MESSAGE))
                             .aspspConsentData(ASPSP_CONSENT_DATA)
                             .success());
 
@@ -730,7 +741,8 @@ public class ConsentServiceTest {
         //When:
         ResponseObject response = consentService.deleteAccountConsentsById(WRONG_CONSENT_ID);
         //Than:
-        assertThat(response.getError().getErrorType()).isEqualTo(ErrorType.AIS_400);
+        assertThat(response.getError().getErrorType()).isEqualTo(ErrorType.AIS_403);
+        assertThat(response.getError().getTppMessage().getMessageErrorCode()).isEqualTo(MessageErrorCode.CONSENT_UNKNOWN_403);
     }
 
     @Test

@@ -19,6 +19,7 @@ package de.adorsys.psd2.xs2a.web.interceptor;
 import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.domain.TppMessageInformation;
 import de.adorsys.psd2.xs2a.exception.MessageError;
+import de.adorsys.psd2.xs2a.web.validator.DefaultMethodValidatorImpl;
 import de.adorsys.psd2.xs2a.web.validator.ErrorBuildingService;
 import de.adorsys.psd2.xs2a.web.validator.MethodValidator;
 import de.adorsys.psd2.xs2a.web.validator.MethodValidatorController;
@@ -29,7 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,12 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Optional;
 
 import static de.adorsys.psd2.xs2a.domain.MessageErrorCode.FORMAT_ERROR;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -55,9 +53,11 @@ public class RequestValidationInterceptorTest {
     private RequestValidationInterceptor interceptor;
 
     @Mock
+    private DefaultMethodValidatorImpl defaultMethodValidator;
+    @Mock
     private ErrorBuildingService errorBuildingService;
     @Spy
-    private MethodValidatorController methodValidatorController = new MethodValidatorController(new ArrayList<>());
+    private MethodValidatorController methodValidatorController = new MethodValidatorController(new ArrayList<>(), defaultMethodValidator);
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -97,6 +97,7 @@ public class RequestValidationInterceptorTest {
     public void preHandle_methodValidator_isNotPresent() throws IOException, NoSuchMethodException {
         Method method = getClass().getDeclaredMethod(METHOD_NAME);
         when(handler.getMethod()).thenReturn(method);
+        when(methodValidatorController.getMethod(anyString())).thenReturn(defaultMethodValidator);
 
         assertTrue(interceptor.preHandle(request, response, handler));
 
@@ -108,7 +109,7 @@ public class RequestValidationInterceptorTest {
         ArgumentCaptor<MessageError> messageErrorCaptor = ArgumentCaptor.forClass(MessageError.class);
         Method method = getClass().getDeclaredMethod(METHOD_NAME);
         when(handler.getMethod()).thenReturn(method);
-        when(methodValidatorController.getMethod(METHOD_NAME)).thenReturn(Optional.of(methodValidator));
+        when(methodValidatorController.getMethod(METHOD_NAME)).thenReturn(methodValidator);
 
 
         assertFalse(interceptor.preHandle(request, response, handler));

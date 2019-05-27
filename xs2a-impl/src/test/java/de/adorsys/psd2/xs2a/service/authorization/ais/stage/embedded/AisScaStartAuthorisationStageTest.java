@@ -61,14 +61,13 @@ import java.util.*;
 import static de.adorsys.psd2.xs2a.domain.consent.ConsentAuthorizationResponseLinkType.START_AUTHORISATION_WITH_AUTHENTICATION_METHOD_SELECTION;
 import static de.adorsys.psd2.xs2a.domain.consent.ConsentAuthorizationResponseLinkType.START_AUTHORISATION_WITH_TRANSACTION_AUTHORISATION;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AisScaStartAuthorisationStageTest {
     private static final String CONSENT_ID = "Test consentId";
     private static final String WRONG_CONSENT_ID = "wrong consent id";
+    private static final String AUTHORISATION_ID = "Test authorisation id";
     private static final String PASSWORD = "Test password";
     private static final String PSU_ID = "Test psuId";
     private static final String TEST_AUTHENTICATION_METHOD_ID = "sms";
@@ -223,7 +222,7 @@ public class AisScaStartAuthorisationStageTest {
         when(aisConsentSpi.authorisePsu(SPI_CONTEXT_DATA, SPI_PSU_DATA, PASSWORD, spiAccountConsent, ASPSP_CONSENT_DATA))
             .thenReturn(spiResponse);
         when(aisConsentMapper.mapToSpiUpdateConsentPsuDataReq(any(UpdateConsentPsuDataResponse.class),
-                                                              any(UpdateConsentPsuDataReq.class))).thenReturn(request);
+            any(UpdateConsentPsuDataReq.class))).thenReturn(request);
 
         UpdateConsentPsuDataResponse actualResponse = scaReceivedAuthorisationStage.apply(request);
 
@@ -438,9 +437,8 @@ public class AisScaStartAuthorisationStageTest {
     }
 
     private UpdateConsentPsuDataResponse buildUpdateConsentPsuDataResponse() {
-        UpdateConsentPsuDataResponse response = new UpdateConsentPsuDataResponse();
+        UpdateConsentPsuDataResponse response = new UpdateConsentPsuDataResponse(ScaStatus.SCAMETHODSELECTED, CONSENT_ID, AUTHORISATION_ID);
         response.setPsuMessage(PSU_SUCCESS_MESSAGE);
-        response.setScaStatus(ScaStatus.SCAMETHODSELECTED);
         return response;
     }
 

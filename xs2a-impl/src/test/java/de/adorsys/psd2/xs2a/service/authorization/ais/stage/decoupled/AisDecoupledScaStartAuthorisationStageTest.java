@@ -57,8 +57,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -262,9 +260,8 @@ public class AisDecoupledScaStartAuthorisationStageTest {
     }
 
     private UpdateConsentPsuDataResponse buildUpdateConsentPsuDataResponse() {
-        UpdateConsentPsuDataResponse response = new UpdateConsentPsuDataResponse();
+        UpdateConsentPsuDataResponse response = new UpdateConsentPsuDataResponse(ScaStatus.SCAMETHODSELECTED, CONSENT_ID, AUTHORISATION_ID);
         response.setPsuMessage(PSU_SUCCESS_MESSAGE);
-        response.setScaStatus(ScaStatus.SCAMETHODSELECTED);
         return response;
     }
 }

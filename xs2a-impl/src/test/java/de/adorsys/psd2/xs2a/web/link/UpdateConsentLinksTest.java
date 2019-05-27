@@ -19,16 +19,16 @@ package de.adorsys.psd2.xs2a.web.link;
 import de.adorsys.psd2.xs2a.core.profile.ScaApproach;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
 import de.adorsys.psd2.xs2a.domain.Links;
-import de.adorsys.psd2.xs2a.domain.consent.UpdateConsentPsuDataReq;
+import de.adorsys.psd2.xs2a.domain.consent.UpdateConsentPsuDataResponse;
 import de.adorsys.psd2.xs2a.service.ScaApproachResolver;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,23 +41,18 @@ public class UpdateConsentLinksTest {
     private ScaApproachResolver scaApproachResolver;
 
     private UpdateConsentLinks links;
-    private UpdateConsentPsuDataReq request;
 
     private Links expectedLinks;
 
     @Before
     public void setUp() {
         expectedLinks = new Links();
-
-        request = new UpdateConsentPsuDataReq();
-        request.setConsentId(CONSENT_ID);
-        request.setAuthorizationId(AUTHORISATION_ID);
     }
 
     @Test
     public void isScaStatusMethodAuthenticated() {
-        request.setScaStatus(ScaStatus.PSUAUTHENTICATED);
-        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, request);
+        UpdateConsentPsuDataResponse response = buildUpdateConsentPsuDataResponse(ScaStatus.PSUAUTHENTICATED);
+        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, response);
 
         expectedLinks.setSelf("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq");
         expectedLinks.setStatus("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq/status");
@@ -67,8 +62,8 @@ public class UpdateConsentLinksTest {
 
     @Test
     public void isAnotherScaStatus_failed() {
-        request.setScaStatus(ScaStatus.FAILED);
-        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, request);
+        UpdateConsentPsuDataResponse response = buildUpdateConsentPsuDataResponse(ScaStatus.FAILED);
+        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, response);
 
         expectedLinks.setSelf("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq");
         expectedLinks.setStatus("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq/status");
@@ -79,8 +74,8 @@ public class UpdateConsentLinksTest {
     public void isScaStatusMethodSelectedAndDecoupleApproach() {
         when(scaApproachResolver.getInitiationScaApproach(eq(AUTHORISATION_ID))).thenReturn(ScaApproach.DECOUPLED);
 
-        request.setScaStatus(ScaStatus.SCAMETHODSELECTED);
-        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, request);
+        UpdateConsentPsuDataResponse response = buildUpdateConsentPsuDataResponse(ScaStatus.SCAMETHODSELECTED);
+        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, response);
 
         expectedLinks.setSelf("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq");
         expectedLinks.setStatus("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq/status");
@@ -92,8 +87,8 @@ public class UpdateConsentLinksTest {
     public void isScaStatusMethodSelectedAndRedirectApproach() {
         when(scaApproachResolver.getInitiationScaApproach(eq(AUTHORISATION_ID))).thenReturn(ScaApproach.REDIRECT);
 
-        request.setScaStatus(ScaStatus.SCAMETHODSELECTED);
-        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, request);
+        UpdateConsentPsuDataResponse response = buildUpdateConsentPsuDataResponse(ScaStatus.SCAMETHODSELECTED);
+        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, response);
 
         expectedLinks.setSelf("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq");
         expectedLinks.setStatus("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq/status");
@@ -103,8 +98,8 @@ public class UpdateConsentLinksTest {
 
     @Test
     public void isScaStatusFinalised() {
-        request.setScaStatus(ScaStatus.FINALISED);
-        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, request);
+        UpdateConsentPsuDataResponse response = buildUpdateConsentPsuDataResponse(ScaStatus.FINALISED);
+        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, response);
 
         expectedLinks.setSelf("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq");
         expectedLinks.setStatus("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq/status");
@@ -114,12 +109,16 @@ public class UpdateConsentLinksTest {
 
     @Test
     public void isScaStatusMethodIdentified() {
-        request.setScaStatus(ScaStatus.PSUIDENTIFIED);
-        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, request);
+        UpdateConsentPsuDataResponse response = buildUpdateConsentPsuDataResponse(ScaStatus.PSUIDENTIFIED);
+        links = new UpdateConsentLinks(HTTP_URL, scaApproachResolver, response);
 
         expectedLinks.setSelf("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq");
         expectedLinks.setStatus("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq/status");
         expectedLinks.setStartAuthorisationWithPsuAuthentication("http://url/v1/consents/9mp1PaotpXSToNCiu4GLwd6mq/authorisations/463318a0-1e33-45d8-8209-e16444b18dda");
         assertEquals(expectedLinks, links);
+    }
+
+    private UpdateConsentPsuDataResponse buildUpdateConsentPsuDataResponse(ScaStatus scaStatus) {
+        return new UpdateConsentPsuDataResponse(scaStatus, CONSENT_ID, AUTHORISATION_ID);
     }
 }

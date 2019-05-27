@@ -16,6 +16,7 @@
 
 package de.adorsys.psd2.xs2a.service;
 
+import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.event.EventType;
 import de.adorsys.psd2.xs2a.core.psu.PsuIdData;
@@ -137,7 +138,7 @@ public class ConsentService {
         }
 
         SpiContextData contextData = spiContextDataProvider.provide(psuData, tppInfo);
-        SpiResponse<SpiInitiateAisConsentResponse> initiateAisConsentSpiResponse = aisConsentSpi.initiateAisConsent(contextData, aisConsentMapper.mapToSpiAccountConsent(accountConsentOptional.get()), aisConsentDataService.getAspspConsentDataByConsentId(consentId));
+        SpiResponse<SpiInitiateAisConsentResponse> initiateAisConsentSpiResponse = aisConsentSpi.initiateAisConsent(contextData, aisConsentMapper.mapToSpiAccountConsent(accountConsentOptional.get()), AspspConsentData.emptyConsentData());
 
         aisConsentDataService.updateAspspConsentData(initiateAisConsentSpiResponse.getAspspConsentData());
 
@@ -157,7 +158,7 @@ public class ConsentService {
         xs2aAccountAccess.ifPresent(accountAccess ->
                                         accountReferenceUpdater.rewriteAccountAccess(consentId, accountAccess));
 
-        CreateConsentResponse createConsentResponse = new CreateConsentResponse(ConsentStatus.RECEIVED.getValue(), consentId, null, null, null, null, multilevelScaRequired);
+        CreateConsentResponse createConsentResponse = new CreateConsentResponse(ConsentStatus.RECEIVED.getValue(), consentId, null, null, null, spiResponsePayload.getPsuMessage(), multilevelScaRequired);
         ResponseObject<CreateConsentResponse> createConsentResponseObject = ResponseObject.<CreateConsentResponse>builder().body(createConsentResponse).build();
 
         if (authorisationMethodDecider.isImplicitMethod(explicitPreferred, multilevelScaRequired)) {
@@ -264,7 +265,7 @@ public class ConsentService {
         }
 
         return ResponseObject.<Void>builder()
-                   .fail(AIS_400, of(CONSENT_UNKNOWN_400)).build();
+                   .fail(AIS_403, of(CONSENT_UNKNOWN_403)).build();
     }
 
     /**

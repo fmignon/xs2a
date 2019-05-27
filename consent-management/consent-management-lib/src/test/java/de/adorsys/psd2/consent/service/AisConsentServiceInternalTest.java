@@ -27,7 +27,9 @@ import de.adorsys.psd2.consent.api.ais.CreateAisConsentRequest;
 import de.adorsys.psd2.consent.domain.PsuData;
 import de.adorsys.psd2.consent.domain.TppInfoEntity;
 import de.adorsys.psd2.consent.domain.account.AisConsent;
+import de.adorsys.psd2.consent.domain.account.AisConsentAction;
 import de.adorsys.psd2.consent.domain.account.AisConsentAuthorization;
+import de.adorsys.psd2.consent.repository.AisConsentActionRepository;
 import de.adorsys.psd2.consent.repository.AisConsentAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.AisConsentRepository;
 import de.adorsys.psd2.consent.service.mapper.AisConsentMapper;
@@ -58,7 +60,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -69,11 +70,12 @@ public class AisConsentServiceInternalTest {
     private static final String PSU_ID = "psu-id-1";
     private static final PsuIdData PSU_ID_DATA = new PsuIdData(PSU_ID, null, null, null);
     private static final PsuData PSU_DATA = new PsuData(PSU_ID, null, null, null);
-    private static final byte[] ENCRYPTED_CONSENT_DATA = "test data".getBytes();
     private static final String FINALISED_CONSENT_ID = "9b112130-6a96-4941-a220-2da8a4af2c65";
     private static final String AUTHORISATION_NUMBER = "Test Authorisation Number";
     private static final String AUTHORISATION_ID = "a01562ea-19ff-4b5a-8188-c45d85bfa20a";
     private static final String INSTANCE_ID = "UNDEFINED";
+    private static final String REQUEST_URI = "request/uri";
+    private static final String TPP_ID = "tppId";
 
     private AisConsent aisConsent;
     private AisConsentAuthorization aisConsentAuthorisation;
@@ -108,6 +110,10 @@ public class AisConsentServiceInternalTest {
     private PsuData anotherPsuDataMocked;
     @Mock
     private CmsPsuService cmsPsuService;
+    @Mock
+    private AisConsentUsageService aisConsentUsageService;
+    @Mock
+    private AisConsentActionRepository aisConsentActionRepository;
 
     @Mock
     private ScaMethodMapper scaMethodMapper;
@@ -117,6 +123,9 @@ public class AisConsentServiceInternalTest {
         aisConsentAuthorisation = buildAisConsentAuthorisation(AUTHORISATION_ID, ScaStatus.RECEIVED);
         aisConsentAuthorisationList.add(aisConsentAuthorisation);
         aisConsent = buildConsent(EXTERNAL_CONSENT_ID);
+        when(tppInfoMapper.mapToTppInfoEntity(buildTppInfo())).thenReturn(buildTppInfoEntity());
+        AisConsentAction action = buildAisConsentAction();
+        when(aisConsentActionRepository.save(action)).thenReturn(action);
     }
 
     @Test
@@ -341,7 +350,6 @@ public class AisConsentServiceInternalTest {
         when(aisConsentMocked.getExternalId())
             .thenReturn(EXTERNAL_CONSENT_ID);
 
-
         boolean result = aisConsentService.findAndTerminateOldConsentsByNewConsentId(EXTERNAL_CONSENT_ID);
 
         assertFalse(result);
@@ -430,11 +438,40 @@ public class AisConsentServiceInternalTest {
         when(aisConsentRepository.findByExternalId(EXTERNAL_CONSENT_ID)).thenReturn(Optional.empty());
 
         try {
-            aisConsentService.checkConsentAndSaveActionLog(new AisConsentActionRequest("tppId", EXTERNAL_CONSENT_ID, ActionStatus.SUCCESS, "request/uri"));
+            aisConsentService.checkConsentAndSaveActionLog(new AisConsentActionRequest(TPP_ID, EXTERNAL_CONSENT_ID, ActionStatus.SUCCESS, REQUEST_URI, true));
             assertTrue("Method works without exceptions", true);
         } catch (Exception ex) {
             fail("Exception should not be appeared.");
         }
+    }
+
+    @Test
+    public void checkConsentAndSaveActionLog_updateUsageCounter() {
+        //Given
+        when(aisConsentRepository.findByExternalId(EXTERNAL_CONSENT_ID)).thenReturn(Optional.ofNullable(aisConsent));
+        //When
+        aisConsentService.checkConsentAndSaveActionLog(new AisConsentActionRequest(TPP_ID, EXTERNAL_CONSENT_ID, ActionStatus.SUCCESS, REQUEST_URI, true));
+        //Then
+        verify(aisConsentUsageService, atLeastOnce()).incrementUsage(aisConsent, REQUEST_URI);
+    }
+
+    @Test
+    public void checkConsentAndSaveActionLog_NotUpdateUsageCounter() {
+        //Given
+        when(aisConsentRepository.findByExternalId(EXTERNAL_CONSENT_ID)).thenReturn(Optional.ofNullable(aisConsent));
+        //When
+        aisConsentService.checkConsentAndSaveActionLog(new AisConsentActionRequest(TPP_ID, EXTERNAL_CONSENT_ID, ActionStatus.SUCCESS, REQUEST_URI, false));
+        //Then
+        verify(aisConsentUsageService, never()).incrementUsage(aisConsent, REQUEST_URI);
+    }
+
+    private AisConsentAction buildAisConsentAction() {
+        AisConsentAction action = new AisConsentAction();
+        action.setActionStatus(ActionStatus.SUCCESS);
+        action.setRequestedConsentId(EXTERNAL_CONSENT_ID);
+        action.setTppId(TPP_ID);
+        action.setRequestDate(LocalDate.now());
+        return action;
     }
 
     private AisConsentAuthorization buildAisConsentAuthorisation(String externalId, ScaStatus scaStatus) {
