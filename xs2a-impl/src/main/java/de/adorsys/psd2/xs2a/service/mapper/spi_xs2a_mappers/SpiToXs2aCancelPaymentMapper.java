@@ -16,8 +16,10 @@
 
 package de.adorsys.psd2.xs2a.service.mapper.spi_xs2a_mappers;
 
+import de.adorsys.psd2.xs2a.core.psu.PsuIdData;
 import de.adorsys.psd2.xs2a.domain.pis.CancelPaymentResponse;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentCancellationResponse;
+import de.adorsys.psd2.xs2a.spi.service.SpiPayment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,12 +29,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SpiToXs2aCancelPaymentMapper {
 
-    public CancelPaymentResponse mapToCancelPaymentResponse(SpiPaymentCancellationResponse spiCancelPayment) {
+    public CancelPaymentResponse mapToCancelPaymentResponse(SpiPaymentCancellationResponse spiCancelPayment, SpiPayment payment, PsuIdData psuData) {
         return Optional.ofNullable(spiCancelPayment)
                    .map(c -> {
                        CancelPaymentResponse response = new CancelPaymentResponse();
                        response.setStartAuthorisationRequired(c.isCancellationAuthorisationMandated());
                        response.setTransactionStatus(c.getTransactionStatus());
+                       response.setPaymentId(payment.getPaymentId());
+                       response.setPaymentProduct(payment.getPaymentProduct());
+                       response.setPaymentType(payment.getPaymentType());
+                       response.setPsuData(psuData);
                        return response;
                    }).orElse(null);
     }

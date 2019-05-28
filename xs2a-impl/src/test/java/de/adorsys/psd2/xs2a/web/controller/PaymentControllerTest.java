@@ -233,17 +233,14 @@ public class PaymentControllerTest {
 
     @Test
     public void cancelPayment_WithoutAuthorisation_Success() {
-        when(responseMapper.ok(any()))
-            .thenReturn(new ResponseEntity<>(getPaymentInitiationCancelResponse200202(de.adorsys.psd2.model.TransactionStatus.CANC), HttpStatus.OK));
-        when(xs2aPaymentService.cancelPayment(any(), any(), any())).thenReturn(getCancelPaymentResponseObject(false));
+        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getCancelPaymentResponseObject(false));
 
         // Given
         PaymentInitiationCancelResponse202 response = getPaymentInitiationCancelResponse200202(de.adorsys.psd2.model.TransactionStatus.CANC);
-        ResponseEntity<PaymentInitiationCancelResponse202> expectedResult = new ResponseEntity<>(response, HttpStatus.OK);
+        ResponseEntity<PaymentInitiationCancelResponse202> expectedResult = new ResponseEntity<>(response, NO_CONTENT);
 
-        when(xs2aPaymentService.cancelPayment(SINGLE, PRODUCT, CORRECT_PAYMENT_ID)).thenReturn(getCancelPaymentResponseObject(false));
         when(paymentModelMapperPsd2.mapToPaymentInitiationCancelResponse(any())).thenReturn(response);
-        when(responseMapper.ok(any())).thenReturn(expectedResult);
+        when(responseMapper.delete(any())).thenReturn(expectedResult);
 
         // When
         ResponseEntity<PaymentInitiationCancelResponse202> actualResult = (ResponseEntity<PaymentInitiationCancelResponse202>) paymentController.cancelPayment(SINGLE.getValue(), PRODUCT,
@@ -253,7 +250,7 @@ public class PaymentControllerTest {
                                                                                                                                                                null, null, null, null, null, null, null, null);
 
         // Then:
-        assertThat(actualResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actualResult.getStatusCode()).isEqualTo(NO_CONTENT);
         assertThat(actualResult.getBody()).isEqualTo(response);
     }
 
@@ -261,8 +258,8 @@ public class PaymentControllerTest {
     public void cancelPayment_WithAuthorisation_Success() {
         when(responseMapper.accepted(any()))
             .thenReturn(new ResponseEntity<>(getPaymentInitiationCancelResponse200202(de.adorsys.psd2.model.TransactionStatus.ACTC), HttpStatus.ACCEPTED));
-        when(xs2aPaymentService.cancelPayment(any(), any(), any())).thenReturn(getCancelPaymentResponseObject(true));
-        when(xs2aPaymentService.cancelPayment(any(), any(), any())).thenReturn(getCancelPaymentResponseObject(true));
+        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getCancelPaymentResponseObject(true));
+        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getCancelPaymentResponseObject(true));
 
         // Given
         PaymentType paymentType = PaymentType.SINGLE;
@@ -283,7 +280,7 @@ public class PaymentControllerTest {
 
     @Test
     public void cancelPayment_WithoutAuthorisation_Fail_FinalisedStatus() {
-        when(xs2aPaymentService.cancelPayment(any(), any(), any())).thenReturn(getErrorOnPaymentCancellation());
+        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getErrorOnPaymentCancellation());
         when(responseErrorMapper.generateErrorResponse(createMessageError(ErrorType.PIS_400, FORMAT_ERROR))).thenReturn(ResponseEntity.status(BAD_REQUEST).build());
 
         // Given
@@ -303,7 +300,7 @@ public class PaymentControllerTest {
 
     @Test
     public void cancelPayment_WithAuthorisation_Fail_FinalisedStatus() {
-        when(xs2aPaymentService.cancelPayment(any(), any(), any())).thenReturn(getErrorOnPaymentCancellation());
+        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getErrorOnPaymentCancellation());
         when(responseErrorMapper.generateErrorResponse(createMessageError(ErrorType.PIS_400, FORMAT_ERROR))).thenReturn(ResponseEntity.status(BAD_REQUEST).build());
 
         // Given

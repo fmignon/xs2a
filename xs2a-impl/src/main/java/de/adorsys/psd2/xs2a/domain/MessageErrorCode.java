@@ -131,7 +131,8 @@ public enum MessageErrorCode {
     INTERNAL_SERVER_ERROR(500),
     UNAUTHORIZED(401),
     CONTENT_TYPE_NOT_SUPPORTED(406),
-    UNSUPPORTED_MEDIA_TYPE(415)
+    UNSUPPORTED_MEDIA_TYPE(415),
+    CANCELLATION_INVALID(405)
     ;
 
     private static Map<String, MessageErrorCode> container = new HashMap<>();

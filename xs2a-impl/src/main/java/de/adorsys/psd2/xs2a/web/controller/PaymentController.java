@@ -231,8 +231,12 @@ public class PaymentController implements PaymentApi {
                                         String psUIPAddress, String psUIPPort, String psUAccept,
                                         String psUAcceptCharset, String psUAcceptEncoding, String psUAcceptLanguage,
                                         String psUUserAgent, String psUHttpMethod, UUID psUDeviceID, String psUGeoLocation) {
+
+        // TODO Get from header
+        Boolean tppExplicitAuthorisationPreferred = false;
+
         ResponseObject<CancelPaymentResponse> serviceResponse = PaymentType.getByValue(paymentService)
-                                                                    .map(type -> xs2aPaymentService.cancelPayment(type, paymentProduct, paymentId))
+                                                                    .map(type -> xs2aPaymentService.cancelPayment(type, paymentProduct, paymentId, tppExplicitAuthorisationPreferred))
                                                                     .orElseGet(ResponseObject.<CancelPaymentResponse>builder()
                                                                                    .fail(ErrorType.PIS_400, TppMessageInformation.of(FORMAT_ERROR))::build);
 
@@ -245,7 +249,7 @@ public class PaymentController implements PaymentApi {
 
         return cancelPayment.isStartAuthorisationRequired()
                    ? responseMapper.accepted(ResponseObject.builder().body(response).build())
-                   : responseMapper.ok(ResponseObject.builder().body(response).build());
+                   : responseMapper.delete(serviceResponse);
     }
 
     @Override
