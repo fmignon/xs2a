@@ -26,6 +26,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+import java.util.Optional;
 
 import static de.adorsys.psd2.xs2a.web.validator.constants.Xs2aHeaderConstant.X_REQUEST_ID;
 
@@ -38,9 +39,9 @@ public class PaymentLoggingInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         Map<String, String> pathVariables = (Map) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        String paymentId = pathVariables != null ?
-            pathVariables.getOrDefault("paymentId", NOT_EXIST_IN_URI):
-            NOT_EXIST_IN_URI;
+        String paymentId = Optional.ofNullable(pathVariables)
+                               .map(vr -> vr.get("paymentId"))
+                               .orElse(NOT_EXIST_IN_URI);
 
         TppLogger.logRequest()
             .withParam("TPP ID", tppService.getTppId())
