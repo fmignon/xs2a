@@ -23,14 +23,16 @@ import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentCancellationRe
 import de.adorsys.psd2.xs2a.util.reader.JsonReader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {SpiToXs2aCancelPaymentMapperImpl.class})
 public class SpiToXs2aCancelPaymentMapperTest {
-    @InjectMocks
+    @Autowired
     private SpiToXs2aCancelPaymentMapper mapper;
     private JsonReader jsonReader = new JsonReader();
 

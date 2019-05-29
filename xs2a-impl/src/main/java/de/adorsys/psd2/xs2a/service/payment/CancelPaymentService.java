@@ -61,6 +61,7 @@ public class CancelPaymentService {
      * @param psuData            ASPSP identifier(s) of the psu
      * @param payment            Payment to be cancelled
      * @param encryptedPaymentId encrypted identifier of the payment
+     * @param tppExplicitAuthorisationPreferred value of tpp's choice of authorisation method
      * @return Response containing information about cancelled payment or corresponding error
      */
     public ResponseObject<CancelPaymentResponse> initiatePaymentCancellation(PsuIdData psuData, SpiPayment payment, String encryptedPaymentId, Boolean tppExplicitAuthorisationPreferred) {
@@ -103,6 +104,7 @@ public class CancelPaymentService {
             return proceedNoScaCancellation(payment, spiContextData, aspspConsentData, encryptedPaymentId);
         }
 
+        // in payment cancellation case 'multilevelScaRequired' is always false
         boolean implicitMethod = authorisationMethodDecider.isImplicitMethod(tppExplicitAuthorisationPreferred, false);
         if (implicitMethod) {
             ResponseObject<Xs2aCreatePisCancellationAuthorisationResponse> authorizationResponse = paymentCancellationAuthorisationService.createPisCancellationAuthorization(encryptedPaymentId, psuData, payment.getPaymentType(), payment.getPaymentProduct());

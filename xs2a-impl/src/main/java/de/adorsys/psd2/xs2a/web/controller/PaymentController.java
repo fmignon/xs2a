@@ -230,10 +230,7 @@ public class PaymentController implements PaymentApi {
                                         Boolean tpPRedirectPreferred, String tpPRedirectURI, String tpPNokRedirectURI,
                                         String psUIPAddress, String psUIPPort, String psUAccept,
                                         String psUAcceptCharset, String psUAcceptEncoding, String psUAcceptLanguage,
-                                        String psUUserAgent, String psUHttpMethod, UUID psUDeviceID, String psUGeoLocation) {
-
-        // TODO Get from header
-        Boolean tppExplicitAuthorisationPreferred = false;
+                                        String psUUserAgent, String psUHttpMethod, UUID psUDeviceID, String psUGeoLocation, Boolean tppExplicitAuthorisationPreferred) {
 
         ResponseObject<CancelPaymentResponse> serviceResponse = PaymentType.getByValue(paymentService)
                                                                     .map(type -> xs2aPaymentService.cancelPayment(type, paymentProduct, paymentId, tppExplicitAuthorisationPreferred))

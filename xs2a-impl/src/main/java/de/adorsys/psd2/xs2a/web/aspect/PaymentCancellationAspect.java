@@ -60,6 +60,7 @@ public class PaymentCancellationAspect extends AbstractLinkAspect<PaymentControl
             boolean isScaRequired = cancellationScaNeededDecider.isScaRequired(response.isStartAuthorisationRequired());
             if (isStartAuthorisationLinksNeeded(isScaRequired, response.getTransactionStatus())) {
 
+                // in payment cancellation case 'multilevelScaRequired' is always false
                 boolean isExplicitMethod = authorisationMethodDecider.isExplicitMethod(tppExplicitAuthorisationPreferred, false);
                 response.setLinks(new PaymentCancellationLinks(getHttpUrl(), scaApproachResolver, redirectLinkBuilder,
                                                                response, isExplicitMethod));

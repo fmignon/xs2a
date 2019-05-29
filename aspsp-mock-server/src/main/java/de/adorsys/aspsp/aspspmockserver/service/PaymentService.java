@@ -234,7 +234,6 @@ public class PaymentService {
             return Optional.empty();
         }
 
-        // TODO delete
         return Optional.of(getPaymentCancellationResponse(true, payments.get(0).getPaymentStatus()));
     }
 

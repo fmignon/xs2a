@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,12 @@ import de.adorsys.psd2.xs2a.core.psu.PsuIdData;
 import de.adorsys.psd2.xs2a.domain.pis.CancelPaymentResponse;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentCancellationResponse;
 import de.adorsys.psd2.xs2a.spi.service.SpiPayment;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.Optional;
+@Mapper(componentModel = "spring")
+public interface SpiToXs2aCancelPaymentMapper {
 
-@Component
-@RequiredArgsConstructor
-public class SpiToXs2aCancelPaymentMapper {
-
-    public CancelPaymentResponse mapToCancelPaymentResponse(SpiPaymentCancellationResponse spiCancelPayment, SpiPayment payment, PsuIdData psuData) {
-        return Optional.ofNullable(spiCancelPayment)
-                   .map(c -> {
-                       CancelPaymentResponse response = new CancelPaymentResponse();
-                       response.setStartAuthorisationRequired(c.isCancellationAuthorisationMandated());
-                       response.setTransactionStatus(c.getTransactionStatus());
-                       response.setPaymentId(payment.getPaymentId());
-                       response.setPaymentProduct(payment.getPaymentProduct());
-                       response.setPaymentType(payment.getPaymentType());
-                       response.setPsuData(psuData);
-                       return response;
-                   }).orElse(null);
-    }
+    @Mapping(target = "startAuthorisationRequired", source = "spiCancelPayment.cancellationAuthorisationMandated")
+    CancelPaymentResponse mapToCancelPaymentResponse(SpiPaymentCancellationResponse spiCancelPayment, SpiPayment payment, PsuIdData psuData);
 }

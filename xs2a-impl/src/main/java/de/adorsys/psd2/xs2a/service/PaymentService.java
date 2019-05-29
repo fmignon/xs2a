@@ -275,6 +275,7 @@ public class PaymentService {
      * @param paymentType        type of payment (payments, bulk-payments, periodic-payments)
      * @param paymentProduct     payment product used for payment creation (e.g. sepa-credit-transfers, instant-sepa-credit-transfers...)
      * @param encryptedPaymentId ASPSP identifier of the payment
+     * @param tppExplicitAuthorisationPreferred value of tpp's choice of authorisation method
      * @return Response containing information about cancelled payment or corresponding error
      */
     public ResponseObject<CancelPaymentResponse> cancelPayment(PaymentType paymentType, String paymentProduct, String encryptedPaymentId, Boolean tppExplicitAuthorisationPreferred) {

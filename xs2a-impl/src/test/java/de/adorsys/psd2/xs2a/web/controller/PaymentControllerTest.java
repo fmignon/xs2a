@@ -90,6 +90,7 @@ public class PaymentControllerTest {
     private static final PaymentInitiationResponse PAYMENT_INITIATION_RESPONSE = new SinglePaymentInitiationResponse();
     private static final PaymentInitationRequestResponse201 PAYMENT_OBJECT = new PaymentInitationRequestResponse201();
     private static final ResponseHeaders RESPONSE_HEADERS = ResponseHeaders.builder().aspspScaApproach(ScaApproach.REDIRECT).build();
+    private static final boolean EXPLICIT_PREFERRED_FALSE = false;
 
     @InjectMocks
     private PaymentController paymentController;
@@ -233,7 +234,7 @@ public class PaymentControllerTest {
 
     @Test
     public void cancelPayment_WithoutAuthorisation_Success() {
-        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getCancelPaymentResponseObject(false));
+        when(xs2aPaymentService.cancelPayment(SINGLE, PRODUCT, CORRECT_PAYMENT_ID, EXPLICIT_PREFERRED_FALSE)).thenReturn(getCancelPaymentResponseObject(false));
 
         // Given
         PaymentInitiationCancelResponse202 response = getPaymentInitiationCancelResponse200202(de.adorsys.psd2.model.TransactionStatus.CANC);
@@ -247,7 +248,7 @@ public class PaymentControllerTest {
                                                                                                                                                                CORRECT_PAYMENT_ID, null, null,
                                                                                                                                                                null, null, null, null, null,
                                                                                                                                                                null, null,
-                                                                                                                                                               null, null, null, null, null, null, null, null);
+                                                                                                                                                               null, null, null, null, null, null, null, null, EXPLICIT_PREFERRED_FALSE);
 
         // Then:
         assertThat(actualResult.getStatusCode()).isEqualTo(NO_CONTENT);
@@ -258,20 +259,19 @@ public class PaymentControllerTest {
     public void cancelPayment_WithAuthorisation_Success() {
         when(responseMapper.accepted(any()))
             .thenReturn(new ResponseEntity<>(getPaymentInitiationCancelResponse200202(de.adorsys.psd2.model.TransactionStatus.ACTC), HttpStatus.ACCEPTED));
-        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getCancelPaymentResponseObject(true));
-        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getCancelPaymentResponseObject(true));
+        when(xs2aPaymentService.cancelPayment(SINGLE, PRODUCT, CORRECT_PAYMENT_ID, EXPLICIT_PREFERRED_FALSE)).thenReturn(getCancelPaymentResponseObject(true));
 
         // Given
         PaymentType paymentType = PaymentType.SINGLE;
         ResponseEntity<PaymentInitiationCancelResponse202> expectedResult = new ResponseEntity<>(getPaymentInitiationCancelResponse200202(de.adorsys.psd2.model.TransactionStatus.ACTC), HttpStatus.ACCEPTED);
 
         // When
-        ResponseEntity<PaymentInitiationCancelResponse202> actualResult = (ResponseEntity<PaymentInitiationCancelResponse202>) paymentController.cancelPayment(paymentType.getValue(),
+        ResponseEntity<PaymentInitiationCancelResponse202> actualResult = (ResponseEntity<PaymentInitiationCancelResponse202>) paymentController.cancelPayment(paymentType.getValue(), PRODUCT,
                                                                                                                                                                CORRECT_PAYMENT_ID, null, null, null,
                                                                                                                                                                null, null, null, null, null,
                                                                                                                                                                null, null,
                                                                                                                                                                null, null, null, null, null,
-                                                                                                                                                               null, null, null);
+                                                                                                                                                               null, null,  EXPLICIT_PREFERRED_FALSE);
 
         // Then:
         assertThat(actualResult.getStatusCode()).isEqualTo(expectedResult.getStatusCode());
@@ -280,19 +280,20 @@ public class PaymentControllerTest {
 
     @Test
     public void cancelPayment_WithoutAuthorisation_Fail_FinalisedStatus() {
-        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getErrorOnPaymentCancellation());
-        when(responseErrorMapper.generateErrorResponse(createMessageError(ErrorType.PIS_400, FORMAT_ERROR))).thenReturn(ResponseEntity.status(BAD_REQUEST).build());
+        ResponseObject<CancelPaymentResponse> cancelPaymentResponse = getErrorOnPaymentCancellation();
+        ResponseEntity expectedResult = ResponseEntity.status(BAD_REQUEST).build();
+        PaymentType paymentType = SINGLE;
+
+        when(xs2aPaymentService.cancelPayment(SINGLE, PRODUCT, CORRECT_PAYMENT_ID, EXPLICIT_PREFERRED_FALSE)).thenReturn(cancelPaymentResponse);
+        when(responseErrorMapper.generateErrorResponse(cancelPaymentResponse.getError())).thenReturn(expectedResult);
 
         // Given
-        PaymentType paymentType = PaymentType.SINGLE;
-        ResponseEntity<PaymentInitiationCancelResponse202> expectedResult = ResponseEntity.badRequest().build();
-
         ResponseEntity actualResult = paymentController.cancelPayment(paymentType.getValue(), PRODUCT,
                                                                       CORRECT_PAYMENT_ID, REQUEST_ID, null, null,
                                                                       null, null, null, null, null,
                                                                       null, null,
                                                                       null, null, null, null,
-                                                                      null, null, null);
+                                                                      null, null, null, EXPLICIT_PREFERRED_FALSE);
 
         // Then:
         assertThat(actualResult.getStatusCode()).isEqualTo(expectedResult.getStatusCode());
@@ -300,7 +301,7 @@ public class PaymentControllerTest {
 
     @Test
     public void cancelPayment_WithAuthorisation_Fail_FinalisedStatus() {
-        when(xs2aPaymentService.cancelPayment(any(), any(), any(), any())).thenReturn(getErrorOnPaymentCancellation());
+        when(xs2aPaymentService.cancelPayment(SINGLE, PRODUCT, CORRECT_PAYMENT_ID, EXPLICIT_PREFERRED_FALSE)).thenReturn(getErrorOnPaymentCancellation());
         when(responseErrorMapper.generateErrorResponse(createMessageError(ErrorType.PIS_400, FORMAT_ERROR))).thenReturn(ResponseEntity.status(BAD_REQUEST).build());
 
         // Given
@@ -312,7 +313,7 @@ public class PaymentControllerTest {
                                                                       null, null, null, null,
                                                                       null, null,
                                                                       null, null, null, null, null,
-                                                                      null, null, null);
+                                                                      null, null, null, EXPLICIT_PREFERRED_FALSE);
 
         // Then:
         assertThat(actualResult.getStatusCode()).isEqualTo(expectedResult.getStatusCode());

@@ -230,13 +230,4 @@ public class PaymentCancellationLinksTest {
 
         assertEquals(expectedLinks, links);
     }
-
-    public CancelPaymentResponse getDefaultCancelPaymentResponse() {
-        CancelPaymentResponse response = new CancelPaymentResponse();
-        response.setAuthorizationId(AUTHORISATION_ID);
-        response.setPaymentId(PAYMENT_ID);
-        response.setPaymentProduct(PAYMENT_PRODUCT);
-        response.setPaymentType(PaymentType.SINGLE);
-        return response;
-    }
 }

@@ -41,7 +41,6 @@ public class CancelPaymentResponse {
     private String paymentId;
     private PaymentType paymentType;
     private String paymentProduct;
-
     private String authorizationId;
     private ScaStatus scaStatus;
     private PsuIdData psuData;
