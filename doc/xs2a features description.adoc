@@ -34,7 +34,7 @@ Following transactions require strong customer authentication (SCA) of the PSU a
 
 === SCA Approaches
 XS2A Interface supports multiple SCA approaches. https://github.com/adorsys/xs2a/tree/develop/aspsp-profile[ASPSP-Profile] may contain a list of approaches (in order of priority - first one with the highest priority).
-Choice of SCA approache also depends on header parameter in initial request - TPP-Redirect-Preferred.
+Choice of SCA approach also depends on header parameter in initial request - TPP-Redirect-Preferred.
 If TPP-Redirect-Preferred is true and ASPSP supports REDIRECT approach, then REDIRECT approach is used. Otherwise first approach in ASPSP-profile is used.
 
 .A list of SCA approaches in ASPSP-Profile
@@ -60,6 +60,14 @@ When applying the embedded approach the SCA of the PSU is executed entirely as p
 ==== Explicit/Implicit start of authorisation
 Explicit start of authorisation is supported in case of Multilevel SCA and in case of Signing Basket, otherwise there is implicit start of authorisation.
 
+==== Authorisation (SCA) Statuses
+Statuses which are defined finalised:
+
+* Finalised (The SCA routine has been finalised successfully)
+* Failed(The SCA routine failed)
+* Exempted (SCA was exempted for the related transaction, the related authorisation is successful)
+
+After setting finalised status for Authorisation status isn't allowed to be changed in CMS any more.
 
 == Payment Initiation Service
 The support of this service at the XS2A interface is mandatory.
@@ -94,6 +102,8 @@ Status settlement:
 
 * Not confirmed with SCA payments obsolete after a certain period. Payment Transaction Status becomes "rejected" and Sca Status for dedicated payment authorisation becomes "failed".
 * In case TPP tries to initiate new authorisation for expired payment, XS2A sends the response with HTTP code 403 RESOURCE_EXPIRED.
+* In case of usage non-existent payment-id XS2A sends response with HTTP code 404 RESOURCE_UNKNOWN.
+
 
 The transaction statuses of the payment initiation resource which are defined as *Finalised*:
 
@@ -162,7 +172,6 @@ A TPP may execute transactions according to this use case to receive the right t
 * First check should be for consent access, and then for expiration.
 * The consent is considered ready to be used by the TPP to access the AIS service when the status is VALID. A consent with RECEIVED status does not have an access token yet. If TPP wants to get account details, transactions and balances with consent which status is Received, XS2A sends the response with HTTP code 401 CONSENT_INVALID.
 * In case of usage non-existent consent-id XS2A sends response  with HTTP code 403 CONSENT_UNKNOWN.
-* In case of usage non-existent payment-id XS2A sends response with HTTP code 404 RESOURCE_UNKNOWN.
 
 === Account Information Service in Redirect approach
 image::ConsentInitRedirect.png[Consent Initiation in Redirect Approach, title='Consent Initiation in Redirect Approach', align='center']
@@ -243,7 +252,7 @@ The ability to create Consent on Account List of Available Accounts depends on s
 This function implies a consent without indication of Accounts. The ASPSP will then agree bilaterally directly with the PSU on which accounts the requested access consent should be supported.
 The ability to create Bank Offered Consent depends on successful validation:
 
-* The attribute in ASPSPS Profile "bankOfferedConsentSupport" should be set to "TRUE",
+* The attribute in ASPSP Profile "bankOfferedConsentSupport" should be set to "TRUE",
 * The call contains the "accounts", "balances" and/or "transactions" sub attribute within the "access" attribute all with an empty array.
 * For this function the Embedded SCA Approach is not supported.
 
@@ -253,7 +262,7 @@ Global consent can be recurring and one-off.
 
 The ability to create Global Consent depends on successful validation:
 
-* The attribute in ASPSPS Profile "allPsd2Support" should be set to "TRUE".
+* The attribute in ASPSP Profile "allPsd2Support" should be set to "TRUE".
 * The call contains the "allPsd2" sub attribute within the "access" attribute with the value "allAccounts".
 * All possible content of "accounts", "balances", "transactions", "availableAccounts" or “availableAccountsWithBalances” fields is ignored if call contains attribute "allPsd2".
 * Applying one or two-factor authorisation depends on the value  of the parameter in ASPSP profile "scaByOneTimeGlobalConsentRequired" (true (by default), false)
