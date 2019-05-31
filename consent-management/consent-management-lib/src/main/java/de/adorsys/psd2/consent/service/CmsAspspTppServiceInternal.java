@@ -38,8 +38,8 @@ import java.util.Optional;
 @Service
 public class CmsAspspTppServiceInternal implements CmsAspspTppService {
     private final TppStopListRepository stopListRepository;
-    private final TppInfoRepository tppInfoRepository;
     private final TppStopListMapper tppStopListMapper;
+    private final TppInfoRepository tppInfoRepository;
     private final TppInfoMapper tppInfoMapper;
 
     @NotNull
@@ -83,8 +83,8 @@ public class CmsAspspTppServiceInternal implements CmsAspspTppService {
 
     @NotNull
     @Override
-    public Optional<TppInfo> getTppInfo(@NotNull String tppId, @NotNull String instanceId) {
-        Optional<TppInfoEntity> tppInfoEntityOptional = tppInfoRepository.findFirstByAuthorisationNumberAndInstanceIdOrderByIdDesc(tppId, instanceId);
+    public Optional<TppInfo> getTppInfo(@NotNull String tppAuthorisationNumber, @NotNull String nationalAuthorityId, @NotNull String instanceId) {
+        Optional<TppInfoEntity> tppInfoEntityOptional = tppInfoRepository.findFirstByAuthorisationNumberAndAuthorityIdAndInstanceId(tppAuthorisationNumber, nationalAuthorityId, instanceId);
         return tppInfoEntityOptional.map(tppInfoMapper::mapToTppInfo);
     }
 }

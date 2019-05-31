@@ -65,10 +65,11 @@ public interface CmsAspspTppService {
     /**
      * Loads TPP info record by TPP ID
      *
-     * @param tppId         ID of TPP to load
-     * @param instanceId    optional ID of particular service instance
+     * @param tppAuthorisationNumber ID of TPP to load
+     * @param nationalAuthorityId    National competent authority ID
+     * @param instanceId             optional ID of particular service instance
      * @return TPP info object if found in DB
      */
     @NotNull
-    Optional<TppInfo> getTppInfo(@NotNull String tppId, @NotNull String instanceId);
+    Optional<TppInfo> getTppInfo(@NotNull String tppAuthorisationNumber, @NotNull String nationalAuthorityId, @NotNull String instanceId);
 }
