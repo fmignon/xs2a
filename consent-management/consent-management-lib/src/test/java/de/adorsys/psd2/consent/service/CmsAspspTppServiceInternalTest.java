@@ -16,32 +16,25 @@
 
 package de.adorsys.psd2.consent.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.Duration;
-import java.util.Optional;
-
 import de.adorsys.psd2.consent.domain.TppInfoEntity;
+import de.adorsys.psd2.consent.domain.TppStopListEntity;
+import de.adorsys.psd2.consent.repository.TppInfoRepository;
+import de.adorsys.psd2.consent.repository.TppStopListRepository;
+import de.adorsys.psd2.consent.service.mapper.TppInfoMapper;
+import de.adorsys.psd2.consent.service.mapper.TppStopListMapper;
 import de.adorsys.psd2.xs2a.core.tpp.TppInfo;
+import de.adorsys.psd2.xs2a.core.tpp.TppStopListRecord;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import de.adorsys.psd2.consent.domain.TppStopListEntity;
-import de.adorsys.psd2.consent.repository.TppInfoRepository;
-import de.adorsys.psd2.consent.repository.TppStopListRepository;
-import de.adorsys.psd2.consent.service.mapper.TppInfoMapper;
-import de.adorsys.psd2.consent.service.mapper.TppStopListMapper;
-import de.adorsys.psd2.xs2a.core.tpp.TppStopListRecord;
+import java.time.Duration;
+import java.util.Optional;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CmsAspspTppServiceInternalTest {
@@ -160,23 +153,23 @@ public class CmsAspspTppServiceInternalTest {
 
     @Test
     public void getTppInfoRecord_Fail_TppEntityIsNotExistInDB() {
-        when(tppInfoRepository.findFirstByAuthorisationNumberAndInstanceIdOrderByIdDesc(AUTHORISATION_NUMBER_NOT_EXISTING, INSTANCE_ID))
+        when(tppInfoRepository.findFirstByAuthorisationNumberAndAuthorityIdAndInstanceId(AUTHORISATION_NUMBER_NOT_EXISTING, AUTHORITY_ID, INSTANCE_ID))
             .thenReturn(Optional.empty());
 
-        Optional<TppInfo> result = cmsAspspTppService.getTppInfo(AUTHORISATION_NUMBER_NOT_EXISTING, INSTANCE_ID);
+        Optional<TppInfo> result = cmsAspspTppService.getTppInfo(AUTHORISATION_NUMBER_NOT_EXISTING, AUTHORITY_ID, INSTANCE_ID);
 
         assertFalse(result.isPresent());
     }
 
     @Test
     public void getTppInfoRecord_Success_TppEntityIsExistInDB() {
-        when(tppInfoRepository.findFirstByAuthorisationNumberAndInstanceIdOrderByIdDesc(AUTHORISATION_NUMBER, INSTANCE_ID))
+        when(tppInfoRepository.findFirstByAuthorisationNumberAndAuthorityIdAndInstanceId(AUTHORISATION_NUMBER, AUTHORITY_ID, INSTANCE_ID))
             .thenReturn(Optional.of(tppInfoEntity));
 
         when(tppInfoMapper.mapToTppInfo(tppInfoEntity))
             .thenReturn(tppInfo);
 
-        Optional<TppInfo> result = cmsAspspTppService.getTppInfo(AUTHORISATION_NUMBER, INSTANCE_ID);
+        Optional<TppInfo> result = cmsAspspTppService.getTppInfo(AUTHORISATION_NUMBER, AUTHORITY_ID, INSTANCE_ID);
 
         assertTrue(result.isPresent());
         assertEquals(tppInfo, result.get());
