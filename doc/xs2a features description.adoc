@@ -196,6 +196,7 @@ The ability to create Consent on Account List of Available Accounts depends on s
 * The call only contains the "availableAccounts" or “availableAccountsWithBalances” sub attribute within the "access" attribute with value "allAccounts".
 * All possible content of "accounts", "balances", "transactions" fields is ignored if call contains attribute "availableAccounts" or “availableAccountsWithBalances”.
 * Applying one or two-factor authorisation depends on the value  of the parameter in ASPSP profile "scaByOneTimeAvailableAccountsConsentRequired" (true (by default), false)
+* When in profile parameter “scaByOneTimeAvailableAccountsConsentRequired”=false, request contains reccuringIndicator=false and in SPIResponse "multilevelSca"=true, then multilevel flag is ignored and Consent become "Valid" after execution one-factor authorisation (login and password) by one PSU. 
 
 .Consent on Account List of Available Accounts
 |===
