@@ -62,10 +62,18 @@ Explicit start of authorisation is supported in case of Multilevel SCA and in ca
 
 
 == Payment Initiation Service
-The support of this use case at the XS2A interface is mandatory.
+The support of this service at the XS2A interface is mandatory.
 Transactions according to this use case can be used to initiate a single payment in form of a credit transfer from an account of the PSU to an account of the payee.
 While the transaction at the XS2A interface is initiated by the TPP, it must first be initiated by the PSU at the PSU – TPP interface.
 The ASPSP will reject the transaction if the TPP cannot be identified correctly at the XS2A interface and/or if it does not have the role PISP. Subject to the decision of the ASPSP, strong customer authentication of the PSU has to be executed.
+
+Current version of the XS2A Interface supports the following types of payments:
+
+* Single payment
+* Future dated single payment
+* Bulk payment
+* Recurring payment
+
 
 === Payment Initiation Service in Redirect Approach
 
