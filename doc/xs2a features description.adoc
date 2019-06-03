@@ -347,7 +347,7 @@ Status settlement:
 
 Consent Statuses which are defined as *Finalised*:
 
-* *Rejected* (The consent data is rejected e.g. since no successful authorisation has taken place)
+* *Rejected* (The consent data is rejected e.g. since no successful authorisation takes place)
 * *RevokedByPSU* (The consent has been revoked by the PSU)
 * *Expired* (The consent has been expired (e.g. after 90 days)
 * *TerminatedByTpp* (The corresponding TPP has terminated the consent by applying the DELETE method to the consent resource)
@@ -446,7 +446,7 @@ In addition, the ASPSP can optionally offer the service of a delta report. In th
 
 == Common features
 === Support of Relative and Global links in responses
-In https://github.com/adorsys/xs2a/tree/develop/aspsp-profile[ASPSP Profile] support of relative links should looks like:
+In https://github.com/adorsys/xs2a/tree/develop/aspsp-profile[ASPSP Profile] support of relative links look like:
 ```
 forceXs2aBaseLinksUrl: true
 xs2aBaseLinksUrl: "/"
