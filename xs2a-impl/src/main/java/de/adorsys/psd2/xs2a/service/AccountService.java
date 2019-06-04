@@ -326,6 +326,7 @@ public class AccountService {
                                                                                                 withBalance, requestUri,
                                                                                                 request.getEntryReferenceFrom(),
                                                                                                 request.getDeltaList(),
+                                                                                                request.getAcceptHeader(),
                                                                                                 request.getBookingStatus());
         ValidationResult validationResult = getTransactionsReportValidator.validate(validatorObject);
         if (validationResult.isNotValid()) {
