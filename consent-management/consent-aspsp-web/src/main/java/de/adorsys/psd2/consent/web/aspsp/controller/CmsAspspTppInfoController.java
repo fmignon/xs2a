@@ -40,9 +40,9 @@ public class CmsAspspTppInfoController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not Found")})
     public ResponseEntity<TppInfo> getTppInfo(
-        @ApiParam(value = "ID of TPP", example = "12345987")
+        @ApiParam(value = "ID of TPP", required = true, example = "12345987")
         @RequestHeader(value = "tpp-authorisation-number") String tppAuthorisationNumber,
-        @ApiParam(value = "National competent authority id", example = "authority id")
+        @ApiParam(value = "National competent authority id", required = true, example = "authority id")
         @RequestHeader(value = "authority-id") String nationalAuthorityId,
         @ApiParam(value = "Service instance id", example = "instance id")
         @RequestHeader(value = "instance-id", required = false, defaultValue = "UNDEFINED") String instanceId) {
