@@ -5,12 +5,12 @@
 * Bugfix: Validate `entryReferenceFrom` and `deltaList` parameters in `Read Transaction List` request
 * Bugfix: Сreate consent request and update PSU authorisation request returns empty list of scaMethods in response
 * Bugfix: Accept `AuthenticationType` from ASPSP even if it is not described in Specification
-* Bugfix: `Get Consent` request doesn't return mandated `lastActionDate` attribute in response body
 * Bugfix: Validate `bookingStatus` query parameter in `Read Transaction List` request
 * Bugfix: `creditorAddress` property is provided to the SPI in payment object even if it was not present in the request
+* Added validation of accept header for getting transaction list (`GET /v1/accounts/{account-id}/transactions`)
+* Bugfix: `Get Consent` request doesn't return mandated `lastActionDate` attribute in response body
 * Bugfix: Payment Cancellation Request update
 * Bugfix: Periodic payment can be created with invalid `dayOfExecution` tag
-* Bugfix: Payment Cancellation Request update
 
 == Bugfix: Consent-related endpoints return incorrect HTTP status code on providing unknown consent ID
 
