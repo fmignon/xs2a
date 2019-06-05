@@ -165,7 +165,7 @@ A TPP may execute transactions according to this use case to receive the right t
 * Get the balances for a list of accounts once or multiple times.
 * Get payment transaction information for a list of accounts once or multiple times.
 
-===== XS2A performs validation of :
+==== XS2A performs validation of :
 
 * TPP data from certificate in request is compared in CMS with TPP data in Consent:
 * Account data should be requested by the same TPP which was given a Consent (TPP Reg_Num = tpp_id). In case when validation is unsuccessful, XS2A sends the response with HTTP code 400 CONSENT_UNKNOWN.

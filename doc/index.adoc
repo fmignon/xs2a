@@ -27,7 +27,7 @@ toc::[]
 == Architecture
 xref:architecture/index.adoc[Architecture documentation]
 
-== XS2A Features description
+== XS2A. Details of realisation
 xref:xs2a features description.adoc[Documentation]
 
 include::version_policy.adoc[]
