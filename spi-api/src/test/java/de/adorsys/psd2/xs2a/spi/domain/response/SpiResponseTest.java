@@ -131,4 +131,11 @@ public class SpiResponseTest {
         assertEquals(0, response.getErrors().size());
         assertEquals(SpiResponseStatus.SUCCESS, response.getResponseStatus());
     }
+
+    @Test
+    public void builder_build_should_generate_message_on_fail() {
+        SpiResponse<String> response = SpiResponse.<String>builder().fail(SpiResponseStatus.LOGICAL_FAILURE);
+        assertTrue(response.hasError());
+        assertFalse(response.getErrors().isEmpty());
+    }
 }

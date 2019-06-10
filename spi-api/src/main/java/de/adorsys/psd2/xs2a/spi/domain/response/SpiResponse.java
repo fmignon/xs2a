@@ -48,9 +48,9 @@ public class SpiResponse<T> {
      * Consent data - a binary data that is stored in a consent management system. Is not parsed by XS2A layer. May be
      * used by SPI layer to store state information linked to a workflow. May be encrypted in case of need.
      *
-     * @deprecated since 3.0. Use SpiAspspConsentDataProvider instead.
      * @see SpiAspspConsentDataProvider
      * // TODO remove aspspConsentData from SPI Response in version 3.4 or later https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/786
+     * @deprecated since 3.0. Use SpiAspspConsentDataProvider instead.
      */
     @Nullable
     @Deprecated
@@ -58,6 +58,7 @@ public class SpiResponse<T> {
 
     /**
      * A status of execution result. Is used to provide correct answer to TPP.
+     *
      * @deprecated since 3.5. Use MessageErrorCode in errors list instead.
      */
     @Deprecated //TODO remove not earlier that 3.8 https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
@@ -71,22 +72,18 @@ public class SpiResponse<T> {
     private final List<TppMessage> errors = new ArrayList<>();
 
     /**
-     * @param payload
-     *         - Payload to be returned. Cannot be null. If you need to return VoidResponse use {@link #voidResponse()}
-     * @param aspspConsentData
-     *         - AspspConsentData to be returned. Cannot be null. Use requests aspspConsentData {@link
-     *         AspspConsentData#respondWith(byte[])} method.
-     * @param responseStatus
-     *         - Status of the processing call. Defaults to error.
-     * @param messages
-     *         - Optional messages to be provided to the TPP.
-     * @deprecated since 3.5. Use Builder instead
+     * @param payload          - Payload to be returned. Cannot be null. If you need to return VoidResponse use {@link #voidResponse()}
+     * @param aspspConsentData - AspspConsentData to be returned. Cannot be null. Use requests aspspConsentData {@link
+     *                         AspspConsentData#respondWith(byte[])} method.
+     * @param responseStatus   - Status of the processing call. Defaults to error.
+     * @param messages         - Optional messages to be provided to the TPP.
      * @see #builder()
+     * @deprecated since 3.5. Use Builder instead
      */
     @Deprecated //TODO remove not earlier that 3.8 https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
     public SpiResponse(T payload, @Nullable @Deprecated AspspConsentData aspspConsentData,
                        SpiResponseStatus responseStatus, List<String> messages
-                      ) {
+    ) {
         if (responseStatus == SUCCESS && payload == null) {
             throw new IllegalArgumentException("Payload must be filled by successful result");
         }
@@ -99,10 +96,10 @@ public class SpiResponse<T> {
     }
 
     /**
-     * @param payload reposnse payload
+     * @param payload          reposnse payload
      * @param aspspConsentData deprecated
-     * @deprecated since 3.5. Use Builder instead
      * @see #builder()
+     * @deprecated since 3.5. Use Builder instead
      */
     @Deprecated //TODO remove not earlier that 3.8 https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
     public SpiResponse(@NotNull T payload, @Nullable @Deprecated AspspConsentData aspspConsentData) {
@@ -125,7 +122,7 @@ public class SpiResponse<T> {
     }
 
     public boolean hasError() {
-        return !errors.isEmpty() || responseStatus != SUCCESS|| payload == null;
+        return !errors.isEmpty() || responseStatus != SUCCESS || payload == null;
     }
 
     public boolean isSuccessful() {
@@ -139,8 +136,8 @@ public class SpiResponse<T> {
     @Deprecated //TODO remove not earlier that 3.8 https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
     public List<String> getMessages() {
         return errors.stream()
-            .map(TppMessage::getMessageText)
-            .collect(toList());
+                   .map(TppMessage::getMessageText)
+                   .collect(toList());
     }
 
     //TODO remove with messages removal https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
@@ -151,8 +148,8 @@ public class SpiResponse<T> {
         MessageErrorCode messageErrorCode = getErrorCodeByStatus(responseStatus);
 
         return messages.stream()
-                .map(m -> new TppMessage(messageErrorCode, m))
-                .collect(toList());
+                   .map(m -> new TppMessage(messageErrorCode, m))
+                   .collect(toList());
     }
 
     @NotNull
@@ -193,10 +190,10 @@ public class SpiResponse<T> {
         }
 
         /**
-         * @deprecated since 3.0. Use SpiAspspConsentDataProvider instead.
-         * @see SpiAspspConsentDataProvider
          * @param aspspConsentData aspspConsentData
          * @return SpiResponseBuilder
+         * @see SpiAspspConsentDataProvider
+         * @deprecated since 3.0. Use SpiAspspConsentDataProvider instead.
          */
         @Deprecated
         public SpiResponseBuilder<T> aspspConsentData(@Nullable AspspConsentData aspspConsentData) {
@@ -207,8 +204,8 @@ public class SpiResponse<T> {
         /**
          * @param message message to add
          * @return SpiResponseBuilder
-         * @deprecated since 3.5. Use error instead
          * @see #error(TppMessage)
+         * @deprecated since 3.5. Use error instead
          */
         @Deprecated //TODO remove not earlier that 3.8 https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
         public SpiResponseBuilder<T> message(@NotNull String message) {
@@ -222,8 +219,8 @@ public class SpiResponse<T> {
         /**
          * @param messages messages to add
          * @return SpiResponseBuilder
-         * @deprecated since 3.5. Use error instead
          * @see #error(List)
+         * @deprecated since 3.5. Use error instead
          */
         @Deprecated //TODO remove not earlier that 3.8 https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
         public SpiResponseBuilder<T> message(List<String> messages) {
@@ -254,8 +251,8 @@ public class SpiResponse<T> {
 
         /**
          * @return SpiResponse object
-         * @deprecated since 3.5. Use build instead
          * @see #build()
+         * @deprecated since 3.5. Use build instead
          */
         @Deprecated //TODO remove not earlier that 3.8 https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
         public SpiResponse<T> success() {
@@ -269,12 +266,13 @@ public class SpiResponse<T> {
         /**
          * @param responseStatus deprecated
          * @return SpiResponse object
-         * @deprecated since 3.5. Use build instead
          * @see #build()
+         * @deprecated since 3.5. Use build instead
          */
         @Deprecated //TODO remove not earlier that 3.8 https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/392
         public SpiResponse<T> fail(@Deprecated @NotNull SpiResponseStatus responseStatus) {
             this.responseStatus = responseStatus;
+            this.errors.add(new TppMessage(getErrorCodeByStatus(responseStatus), ""));
             return new SpiResponse<>(this);
         }
 
