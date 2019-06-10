@@ -32,7 +32,6 @@ public class ErrorHolderTest {
     private static final String ERROR_MESSAGE = "Some message";
     private static final String ANOTHER_ERROR_MESSAGE = "Another message";
 
-
     @Test
     public void build() {
         TppMessageInformation tppMessage = TppMessageInformation.of(MESSAGE_ERROR_CODE, ERROR_MESSAGE);
@@ -72,7 +71,6 @@ public class ErrorHolderTest {
     @Test
     public void build_withMultipleTppMessages() {
         TppMessageInformation tppMessageInformation = TppMessageInformation.of(MESSAGE_ERROR_CODE, ERROR_MESSAGE);
-
 
         ErrorHolder build = ErrorHolder.builder(MESSAGE_ERROR_CODE)
                                 .errorType(ERROR_TYPE)
