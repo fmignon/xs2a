@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1eecf4ae-546e-4ba3-8df6-67385978e975",
+		"_postman_id": "d21259c5-47aa-4342-b8b5-bd333dc8a42e",
 		"name": "AIS Consent requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -5351,7 +5351,7 @@
 											"    mm_end='0'+mm_end;",
 											"} ",
 											"//==========================",
-											"var start = new Date(end-(3600*24*1000*150));",
+											"var start = new Date(end-(3600*24*1000*350));",
 											"var dd_start = start.getDate();",
 											"var mm_start = start.getMonth(); ",
 											"var yyyy_start = start.getFullYear();",
@@ -5401,7 +5401,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{protocol}}://{{url_xs2a}}/v1/accounts/{{aspsp_account_id_single}}/transactions?bookingStatus={{booking_status}}&withBalance={{with_balance}}&dateFrom=2018-10-10&dateTo={{endFormat}}",
+									"raw": "{{protocol}}://{{url_xs2a}}/v1/accounts/{{aspsp_account_id_single}}/transactions?bookingStatus={{booking_status}}&withBalance={{with_balance}}&dateFrom=2018-01-10&dateTo=2020-10-10",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{url_xs2a}}"
@@ -5423,11 +5423,11 @@
 										},
 										{
 											"key": "dateFrom",
-											"value": "2018-10-10"
+											"value": "2018-01-10"
 										},
 										{
 											"key": "dateTo",
-											"value": "{{endFormat}}"
+											"value": "2020-10-10"
 										}
 									]
 								},

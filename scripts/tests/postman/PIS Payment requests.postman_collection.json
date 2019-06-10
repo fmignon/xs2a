@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dee72aba-518a-432d-9180-fe289497d22a",
+		"_postman_id": "7a603084-3969-4168-8f76-658825a3e0b7",
 		"name": "PIS Payment requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2916,15 +2916,15 @@
 											"raw": ""
 										},
 										"url": {
-											"raw": "{{protocol}}://{{url_xs2a}}/v1/{{payment_service_single}}/{{payment_product_sepa}}/{{payment_id}}/cancellation-authorisations",
+											"raw": "{{protocol}}://{{url_xs2a}}/v1/{{payment_service}}/{{payment_product}}/{{payment_id}}/cancellation-authorisations",
 											"protocol": "{{protocol}}",
 											"host": [
 												"{{url_xs2a}}"
 											],
 											"path": [
 												"v1",
-												"{{payment_service_single}}",
-												"{{payment_product_sepa}}",
+												"{{payment_service}}",
+												"{{payment_product}}",
 												"{{payment_id}}",
 												"cancellation-authorisations"
 											]
@@ -3942,15 +3942,15 @@
 											"raw": ""
 										},
 										"url": {
-											"raw": "{{protocol}}://{{url_xs2a}}/v1/{{payment_service_single}}/{{payment_product_sepa}}/{{payment_id}}/cancellation-authorisations",
+											"raw": "{{protocol}}://{{url_xs2a}}/v1/{{payment_service}}/{{payment_product}}/{{payment_id}}/cancellation-authorisations",
 											"protocol": "{{protocol}}",
 											"host": [
 												"{{url_xs2a}}"
 											],
 											"path": [
 												"v1",
-												"{{payment_service_single}}",
-												"{{payment_product_sepa}}",
+												"{{payment_service}}",
+												"{{payment_product}}",
 												"{{payment_id}}",
 												"cancellation-authorisations"
 											]
