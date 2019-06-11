@@ -30,6 +30,11 @@ import java.util.List;
 public class SpiErrorMapper {
     public ErrorHolder mapToErrorHolder(SpiResponse<?> spiResponse, ServiceType serviceType) {
         List<TppMessage> errors = spiResponse.getErrors();
+
+        if (errors.isEmpty()) {
+            throw new IllegalArgumentException("SPI response must contain errors for mapping");
+        }
+
         TppMessage firstTppMessage = errors.get(0);
 
         TppMessageInformation[] tppMessages = errors.stream()

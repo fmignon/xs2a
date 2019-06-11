@@ -109,4 +109,13 @@ public class SpiErrorMapperTest {
         assertEquals(Arrays.asList(expectedFirstTppMessage, expectedSecondTppMessage), errorHolder.getTppMessageInformationList());
         assertEquals(firstErrorType, errorHolder.getErrorType());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void mapToErrorHolder_withoutErrors_shouldThrowIllegalArgumentException() {
+        //Given:
+        SpiResponse spiResponse = SpiResponse.<String>builder().payload("some payload").build();
+
+        //When:
+        spiErrorMapper.mapToErrorHolder(spiResponse, ServiceType.PIS);
+    }
 }

@@ -93,6 +93,10 @@ public class SpiResponse<T> {
         if (CollectionUtils.isNotEmpty(messages)) {
             this.errors.addAll(messagesToErrors(this.responseStatus, messages));
         }
+
+        if (responseStatus != SUCCESS && CollectionUtils.isEmpty(messages)) {
+            this.errors.add(new TppMessage(getErrorCodeByStatus(responseStatus), ""));
+        }
     }
 
     /**
@@ -246,6 +250,11 @@ public class SpiResponse<T> {
             if (this.responseStatus == null) {
                 this.responseStatus = this.errors.isEmpty() ? SUCCESS : LOGICAL_FAILURE;
             }
+
+            if (payload == null && CollectionUtils.isEmpty(errors)) {
+                this.error(new TppMessage(MessageErrorCode.INTERNAL_SERVER_ERROR, ""));
+            }
+
             return new SpiResponse<>(this);
         }
 
